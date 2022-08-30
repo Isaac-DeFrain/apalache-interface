@@ -1,0 +1,3 @@
+(library
+ (name apalache_tla_interface)
+ (libraries base))

@@ -1,0 +1,4 @@
+(executable
+ (public_name apalache_tla_interface)
+ (name main)
+ (libraries apalache_tla_interface))
