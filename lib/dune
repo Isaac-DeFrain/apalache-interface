@@ -1,3 +1,6 @@
 (library
  (name apalache_tla_interface)
- (libraries base))
+ (libraries core)
+ (inline_tests)
+ (preprocess
+  (pps ppx_jane)))
