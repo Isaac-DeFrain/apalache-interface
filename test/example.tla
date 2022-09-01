@@ -15,7 +15,7 @@ vars == <<x>>
 \* @type: Int => Int;
 incr(z) == z + 1
 
-\* @type: (Int, Int) => Int;
+\* @type: (Int, Int) -> Int;
 add[ y \in Int, z \in Int ] == y + z
 
 \* @type: Str;

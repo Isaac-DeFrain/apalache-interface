@@ -23,6 +23,11 @@ let tla_decl_map tla_lines =
         ignore @@ Hashtbl.add tla_map ~key:s ~data:(i, ind));
   tla_map
 
+let mk_annotation ws key data =
+  match key with
+  | Def _ -> Printf.sprintf "%s\\* @type: %s;" ws data
+  | Alias _ -> Printf.sprintf "%s\\* @typeAlias: %s;" ws data
+
 (* translate apalache type declarations into tla file *)
 let translate path =
   let open Hashtbl in
@@ -33,7 +38,7 @@ let translate path =
   let new_tla_lines =
     let added_lines = ref [] in
     fold apalache_decl_map ~init:tla_lines ~f:(fun ~key ~data acc ->
-        match find tla_decl_map key with
+        match find tla_decl_map (of_kind key) with
         | Some (ln, ind) ->
           let open List in
           let n = count !added_lines ~f:(( > ) ln) in
@@ -50,8 +55,8 @@ let translate path =
               front
           in
           let ind = String.make ind ' ' in
-          let insert = Printf.sprintf "%s\\* @type: %s;" ind data in
-          front @ (insert :: back)
+          let annotation = mk_annotation ind key data in
+          front @ (annotation :: back)
         | None -> acc)
   in
   Stdio.Out_channel.write_lines tla_path new_tla_lines

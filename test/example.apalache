@@ -1,7 +1,7 @@
-x : a
+def x : a
 
-add : (Int, Int) -> Int
+def add : (Int, Int) -> Int
 
-const : Str
+def const : Str
 
-incr : Int => Int
+def incr : Int => Int
