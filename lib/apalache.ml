@@ -1,31 +1,19 @@
 open! Core
 
-[@@@warning "-26"]
+(* get apalache declarations *)
 
-(* apalache + tla -> tla *)
-
-let get_tla_decl_name s =
-  let open String in
-  let s = strip s in
-  let f c = not Char.(c = '-' || c = '\\' || c = '=' || c = '(' || c = '*' || c = '[') in
-  let s' = String.take_while s ~f |> strip in
-  if s <> s' then s' else ""
-
-(*  *)
-let translate path =
-  let open Hashtbl in
-  let tla_lines = Stdio.In_channel.read_lines path in
-  let tla_op_num_map =
-    let tla_map = create (module String) in
-    List.iteri tla_lines ~f:(fun i s ->
-      let s' = get_tla_decl_name s in
-      if not String.(is_empty s') then
-        add tla_map ~key:s ~data:i |> fun _ -> ());
-    tla_map
-  in
-  (* get apalache decls *)
-  (* insert type defs where appropriate *)
-  ()
+let apalache_decl_map path =
+  let apalache_lines = Stdio.In_channel.read_lines (path ^ ".apalache") in
+  let apalache_map = Hashtbl.create (module String) in
+  List.iter apalache_lines ~f:(fun s ->
+      let open String in
+      match split ~on:':' s with
+      | [ name; type_def ] ->
+        let name = strip name in
+        let type_def = strip type_def in
+        ignore @@ Hashtbl.add apalache_map ~key:name ~data:type_def
+      | _ -> ());
+  apalache_map
 
 (* tla -> apalache + tla *)
 
@@ -42,14 +30,8 @@ let rec group_block_comments ?(is_block = false) ?(temp = []) acc =
         if suffix hd 2 <> "*)" then
           group_block_comments ~is_block acc ~temp:(hd :: temp) tl
         else
+          let flushed = List.rev (hd :: temp) in
           group_block_comments ~is_block:false
-            (concat ~sep:"\n" (List.rev (hd :: temp)) :: acc)
+            (concat ~sep:"\n" flushed :: acc)
             tl
       else group_block_comments ~is_block (hd :: acc) ~temp tl)
-
-(* let rec lines_to_comment_decls = () *)
-
-(* translate and clean the .tla file *)
-let untranslate path =
-  let tla_lines = Stdio.In_channel.read_lines path in
-  ()
