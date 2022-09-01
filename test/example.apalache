@@ -1,0 +1,7 @@
+x : a
+
+add : (Int, Int) -> Int
+
+const : Str
+
+incr : Int => Int
